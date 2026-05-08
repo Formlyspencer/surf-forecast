@@ -1,0 +1,39 @@
+name: Update forecast
+
+on:
+  schedule:
+    - cron: '15 */3 * * *'  # every 3 hours, 15 min past
+  workflow_dispatch:        # let you trigger manually
+  push:
+    branches: [main]
+    paths:
+      - '**.py'
+      - '.github/workflows/update.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run pipeline
+        run: python main.py
+
+      - name: Commit updated forecast
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update forecast $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

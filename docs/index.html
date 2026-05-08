@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="900">
+<title>Folly Beach surf windows</title>
+<style>
+:root {
+  --bg: #0e1116;
+  --panel: #161b22;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --border: #30363d;
+  --bright-green: #2ea043;
+  --light-green: #56d364;
+  --yellow: #d29922;
+  --orange: #db6d28;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  max-width: 720px; margin-left: auto; margin-right: auto;
+  -webkit-font-smoothing: antialiased;
+}
+h1 { font-size: 22px; margin: 4px 0 2px; }
+h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600; }
+.subtitle { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+.now {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 20px;
+  font-size: 14px;
+}
+.now .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.day { margin-bottom: 18px; }
+.day-header {
+  font-size: 14px; font-weight: 600; color: var(--muted);
+  border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 10px;
+  display: flex; justify-content: space-between;
+}
+.tide-line { font-size: 11px; color: var(--muted); font-weight: 400; }
+.window {
+  background: var(--panel); border-left: 4px solid;
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 12px;
+  align-items: center;
+}
+.window.bright-green { border-left-color: var(--bright-green); }
+.window.light-green  { border-left-color: var(--light-green); }
+.window.yellow       { border-left-color: var(--yellow); }
+.window.orange       { border-left-color: var(--orange); }
+.win-time { font-weight: 600; font-size: 15px; min-width: 110px; }
+.win-detail { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.win-score {
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 16px;
+  padding: 4px 8px; border-radius: 6px; min-width: 44px; text-align: center;
+}
+.win-score.bright-green { background: var(--bright-green); color: white; }
+.win-score.light-green  { background: var(--light-green); color: #0e1116; }
+.win-score.yellow       { background: var(--yellow); color: #0e1116; }
+.win-score.orange       { background: var(--orange); color: white; }
+.empty {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
+}
+.legend { font-size: 11px; color: var(--muted); margin-top: 24px; line-height: 1.6; }
+.legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 8px; vertical-align: middle; }
+footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: center; }
+.factors { font-size: 10px; color: var(--muted); margin-top: 4px; font-family: ui-monospace, monospace; }
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff; --panel: #f6f8fa; --text: #1f2328;
+    --muted: #57606a; --border: #d0d7de;
+  }
+}
+</style>
+</head>
+<body>
+<h1>Folly Beach surf windows</h1>
+<div class="subtitle">Folly Beach, SC · 7-day outlook</div>
+
+<div class="now">
+  <div class="label">Buoy 41004 · 9:00 PM</div>
+  wind S 14kt
+  <div class="label" style="margin-top:8px">Last updated</div>
+  Tue May 5, 9:27 PM EDT
+</div>
+
+<div class="empty">No surfable windows in the next 7 days.<br><span style="font-size:12px">Conditions don't clear the orange threshold. Check back tomorrow.</span></div>
+
+<div class="legend">
+<strong>Score buckets:</strong>
+<span class="swatch" style="background:var(--bright-green)"></span>≥65 stellar
+<span class="swatch" style="background:var(--light-green)"></span>≥45 good
+<span class="swatch" style="background:var(--yellow)"></span>≥30 decent
+<span class="swatch" style="background:var(--orange)"></span>≥20 marginal<br>
+Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
+</div>
+
+<footer>Data: Open-Meteo (waves + wind), NOAA CO-OPS station 8665530 (tides), NDBC buoy 41004 (current obs). Page auto-refreshes every 15 min.</footer>
+</body>
+</html>
