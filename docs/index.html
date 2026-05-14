@@ -16,6 +16,7 @@
   --light-green: #56d364;
   --yellow: #d29922;
   --orange: #db6d28;
+  --red: #da3633;
 }
 * { box-sizing: border-box; }
 body {
@@ -51,6 +52,7 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .window.light-green  { border-left-color: var(--light-green); }
 .window.yellow       { border-left-color: var(--yellow); }
 .window.orange       { border-left-color: var(--orange); }
+.window.red          { border-left-color: var(--red); opacity: 0.85; }
 .win-time { font-weight: 600; font-size: 15px; min-width: 110px; }
 .win-detail { font-size: 12px; color: var(--muted); line-height: 1.4; }
 .win-score {
@@ -61,6 +63,14 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .win-score.light-green  { background: var(--light-green); color: #0e1116; }
 .win-score.yellow       { background: var(--yellow); color: #0e1116; }
 .win-score.orange       { background: var(--orange); color: white; }
+.win-score.red          { background: var(--red); color: white; }
+.fallback-note {
+  background: var(--panel); border-left: 4px solid var(--red);
+  border-radius: 8px; padding: 10px 14px; margin: 12px 0 16px;
+  font-size: 13px; color: var(--text);
+}
+.fallback-note strong { color: var(--red); }
+.fallback-note .sub { color: var(--muted); font-size: 12px; margin-top: 4px; display: block; }
 .empty {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
@@ -82,20 +92,54 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
 <div class="subtitle">Folly Beach, SC · 7-day outlook</div>
 
 <div class="now">
-  <div class="label">Buoy 41004 · 7:00 AM</div>
-  wind W 12kt
+  <div class="label">Buoy 41004 · 7:30 AM</div>
+  wind W 14kt
   <div class="label" style="margin-top:8px">Last updated</div>
-  Thu May 14, 7:22 AM EDT
+  Thu May 14, 7:58 AM EDT
 </div>
 
-<div class="empty">No surfable windows in the next 7 days.<br><span style="font-size:12px">Conditions don't clear the orange threshold. Check back tomorrow.</span></div>
+
+<div class="fallback-note">
+  <strong>Nothing surfable in the next 7 days.</strong>
+  <span class="sub">Here are the 3 hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
+</div>
+
+<div class="day">
+  <div class="day-header"><span>Thursday · May 14</span><span class="tide-line">L 12:18 AM · H 6:13 AM · L 12:24 PM · H 6:43 PM</span></div>
+  
+<div class="window red">
+  <div class="win-time">7 AM – 11 AM</div>
+  <div class="win-detail">peak 8 AM: 1.9ft @ 6s · swell ESE · wind W 9kt · falling</div>
+  <div class="win-score red">7</div>
+</div>
+
+<div class="window red">
+  <div class="win-time">2 PM – 9 PM</div>
+  <div class="win-detail">peak 6 PM: 1.5ft @ 6s · swell ESE · wind WNW 9kt · high peak</div>
+  <div class="win-score red">0</div>
+</div>
+
+</div>
+
+<div class="day">
+  <div class="day-header"><span>Monday · May 18</span><span class="tide-line">L 3:58 AM · H 9:52 AM · L 3:53 PM · H 10:19 PM</span></div>
+  
+<div class="window red">
+  <div class="win-time">7 AM – 3 PM</div>
+  <div class="win-detail">peak 9 AM: 2.0ft @ 6s · swell SSE · wind SE 4kt · high peak</div>
+  <div class="win-score red">7</div>
+</div>
+
+</div>
+
 
 <div class="legend">
 <strong>Score buckets:</strong>
 <span class="swatch" style="background:var(--bright-green)"></span>≥65 stellar
 <span class="swatch" style="background:var(--light-green)"></span>≥45 good
 <span class="swatch" style="background:var(--yellow)"></span>≥30 decent
-<span class="swatch" style="background:var(--orange)"></span>≥20 marginal<br>
+<span class="swatch" style="background:var(--orange)"></span>≥20 marginal
+<span class="swatch" style="background:var(--red)"></span>below 20 — shown only when nothing else qualifies<br>
 Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
 </div>
 

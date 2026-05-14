@@ -21,6 +21,7 @@ CSS = """
   --light-green: #56d364;
   --yellow: #d29922;
   --orange: #db6d28;
+  --red: #da3633;
 }
 * { box-sizing: border-box; }
 body {
@@ -56,6 +57,7 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .window.light-green  { border-left-color: var(--light-green); }
 .window.yellow       { border-left-color: var(--yellow); }
 .window.orange       { border-left-color: var(--orange); }
+.window.red          { border-left-color: var(--red); opacity: 0.85; }
 .win-time { font-weight: 600; font-size: 15px; min-width: 110px; }
 .win-detail { font-size: 12px; color: var(--muted); line-height: 1.4; }
 .win-score {
@@ -66,6 +68,14 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .win-score.light-green  { background: var(--light-green); color: #0e1116; }
 .win-score.yellow       { background: var(--yellow); color: #0e1116; }
 .win-score.orange       { background: var(--orange); color: white; }
+.win-score.red          { background: var(--red); color: white; }
+.fallback-note {
+  background: var(--panel); border-left: 4px solid var(--red);
+  border-radius: 8px; padding: 10px 14px; margin: 12px 0 16px;
+  font-size: 13px; color: var(--text);
+}
+.fallback-note strong { color: var(--red); }
+.fallback-note .sub { color: var(--muted); font-size: 12px; margin-top: 4px; display: block; }
 .empty {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
@@ -144,22 +154,26 @@ def _now_panel(buoy, fetched_at: datetime) -> str:
 """
 
 
-def render(windows: list[Window], extremes: list[dict], buoy, fetched_at: datetime) -> str:
+def render(
+    windows: list[Window],
+    extremes: list[dict],
+    buoy,
+    fetched_at: datetime,
+    fallback_windows: list[Window] | None = None,
+) -> str:
     tz = ZoneInfo(config.TZ)
-
-    by_date: dict = defaultdict(list)
-    for w in windows:
-        by_date[w.start.date()].append(w)
+    fallback_windows = fallback_windows or []
 
     extremes_by_date: dict = defaultdict(list)
     for e in extremes:
         extremes_by_date[e["time"].date()].append(e)
 
     days_html = []
-    if not windows:
-        days_html.append("""<div class="empty">No surfable windows in the next 7 days.<br><span style="font-size:12px">Conditions don't clear the orange threshold. Check back tomorrow.</span></div>""")
-    else:
-        # Iterate days that have at least one window, in date order
+
+    if windows:
+        by_date: dict = defaultdict(list)
+        for w in windows:
+            by_date[w.start.date()].append(w)
         for date in sorted(by_date.keys()):
             day_windows = by_date[date]
             extremes_today = extremes_by_date.get(date, [])
@@ -182,6 +196,42 @@ def render(windows: list[Window], extremes: list[dict], buoy, fetched_at: dateti
   {''.join(wins_html)}
 </div>
 """)
+    elif fallback_windows:
+        days_html.append(f"""
+<div class="fallback-note">
+  <strong>Nothing surfable in the next 7 days.</strong>
+  <span class="sub">Here are the {len(fallback_windows)} hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
+</div>
+""")
+        by_date_fb: dict = defaultdict(list)
+        for w in fallback_windows:
+            by_date_fb[w.start.date()].append(w)
+        for date in sorted(by_date_fb.keys()):
+            day_windows = by_date_fb[date]
+            extremes_today = extremes_by_date.get(date, [])
+            tide_str = _tide_summary(extremes_today) if extremes_today else ""
+            day_label = date.strftime("%A · %b %-d")
+
+            wins_html = []
+            for w in sorted(day_windows, key=lambda x: x.start):
+                # Show score as integer even if it's tiny (e.g. "9" or "0")
+                score_pct = int(round(w.peak_hour.score * 100))
+                wins_html.append(f"""
+<div class="window {w.color}">
+  <div class="win-time">{html.escape(_fmt_window_range(w))}</div>
+  <div class="win-detail">{html.escape(_fmt_window_detail(w))}</div>
+  <div class="win-score {w.color}">{score_pct}</div>
+</div>
+""")
+
+            days_html.append(f"""
+<div class="day">
+  <div class="day-header"><span>{html.escape(day_label)}</span><span class="tide-line">{html.escape(tide_str)}</span></div>
+  {''.join(wins_html)}
+</div>
+""")
+    else:
+        days_html.append("""<div class="empty">No data — APIs may be unreachable.<br><span style="font-size:12px">Try refreshing in a few minutes.</span></div>""")
 
     legend = """
 <div class="legend">
@@ -189,7 +239,8 @@ def render(windows: list[Window], extremes: list[dict], buoy, fetched_at: dateti
 <span class="swatch" style="background:var(--bright-green)"></span>≥65 stellar
 <span class="swatch" style="background:var(--light-green)"></span>≥45 good
 <span class="swatch" style="background:var(--yellow)"></span>≥30 decent
-<span class="swatch" style="background:var(--orange)"></span>≥20 marginal<br>
+<span class="swatch" style="background:var(--orange)"></span>≥20 marginal
+<span class="swatch" style="background:var(--red)"></span>below 20 — shown only when nothing else qualifies<br>
 Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
 </div>
 """

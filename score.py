@@ -166,7 +166,24 @@ def color_bucket(score: float) -> str | None:
     if score >= config.LIGHT_GREEN:  return "light-green"
     if score >= config.YELLOW:       return "yellow"
     if score >= config.ORANGE:       return "orange"
-    return None  # below threshold → hide
+    return None  # below threshold → hide (use find_fallback_windows for red)
+
+
+def _alignment(h: Hour) -> float:
+    """Quality of non-wave factors only (swell-dir × wind-dir × wind-speed × tide).
+    Used to rank fallback windows when wave score is the limiter.
+    """
+    return (h.factors["swell_dir"] * h.factors["wind_dir"]
+            * h.factors["wind_speed"] * h.factors["tide"])
+
+
+def _fallback_quality(h: Hour) -> float:
+    """Used to rank fallback hours/windows. Combines alignment with a soft
+    wave proxy so a 2ft day ranks higher than a 0.5ft day even if everything
+    else is the same.
+    """
+    wave_proxy = min(1.0, (h.wave_h_ft or 0) / 4.0)
+    return _alignment(h) * wave_proxy
 
 
 def build_hours(bundle: dict) -> list[Hour]:
@@ -298,6 +315,60 @@ def find_windows(hours: list[Hour]) -> list[Window]:
             run.append(h)
     flush()
     return windows
+
+
+def find_fallback_windows(hours: list[Hour], n: int | None = None) -> list[Window]:
+    """Surface the 'least-bad' windows when no real windows clear orange.
+
+    Groups consecutive hours where non-wave factors don't zero out (so swell
+    direction is in the acceptable arc, tide isn't no-go low, wind isn't pure
+    crossshore). Ranks resulting windows by alignment × soft-wave proxy and
+    returns the top N (default config.RED_FALLBACK_COUNT). All returned
+    windows are tagged "red".
+
+    Use only when find_windows() returns empty.
+    """
+    if n is None:
+        n = config.RED_FALLBACK_COUNT
+
+    runs: list[list[Hour]] = []
+    run: list[Hour] = []
+
+    def flush():
+        if not run:
+            return
+        duration_h = (run[-1].t - run[0].t).total_seconds() / 3600 + 1
+        if duration_h >= config.MIN_WINDOW_HOURS:
+            runs.append(list(run))
+
+    for h in hours:
+        # Require at least minimal alignment — skip hours where any non-wave
+        # factor is zero (crossshore wind, low-tide nogo, swell out of arc)
+        if _alignment(h) < 0.05:
+            flush()
+            run = []
+            continue
+        if run and (h.t - run[-1].t) > timedelta(hours=1):
+            flush()
+            run = [h]
+        else:
+            run.append(h)
+    flush()
+
+    windows: list[Window] = []
+    for r in runs:
+        peak = max(r, key=_fallback_quality)
+        avg = sum(h.score for h in r) / len(r)
+        windows.append(Window(
+            start=r[0].t,
+            end=r[-1].t + timedelta(hours=1),
+            peak_hour=peak,
+            avg_score=avg,
+            color="red",
+        ))
+
+    windows.sort(key=lambda w: _fallback_quality(w.peak_hour), reverse=True)
+    return windows[:n]
 
 
 if __name__ == "__main__":
