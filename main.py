@@ -9,10 +9,22 @@ import render
 
 
 def main():
+    from datetime import timedelta
+
     bundle = fetch.fetch_all()
     hours = score.build_hours(bundle)
     windows = score.find_windows(hours)
-    fallback = score.find_fallback_windows(hours) if not windows else []
+
+    # Build the set of hour-timestamps already covered by real windows so we
+    # don't double-display them as red windows.
+    covered = set()
+    for w in windows:
+        cur = w.start
+        while cur < w.end:
+            covered.add(cur)
+            cur += timedelta(hours=1)
+    fallback = score.find_fallback_windows(hours, exclude_times=covered)
+
     html = render.render(
         windows=windows,
         fallback_windows=fallback,

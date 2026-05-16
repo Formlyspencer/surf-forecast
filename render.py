@@ -76,6 +76,11 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 }
 .fallback-note strong { color: var(--red); }
 .fallback-note .sub { color: var(--muted); font-size: 12px; margin-top: 4px; display: block; }
+.section-heading {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 28px 0 8px;
+}
 .empty {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
@@ -168,53 +173,18 @@ def render(
     for e in extremes:
         extremes_by_date[e["time"].date()].append(e)
 
-    days_html = []
-
-    if windows:
+    def render_day_groups(window_list: list[Window]) -> str:
+        """Group windows by day and emit day cards."""
         by_date: dict = defaultdict(list)
-        for w in windows:
+        for w in window_list:
             by_date[w.start.date()].append(w)
+        out = []
         for date in sorted(by_date.keys()):
-            day_windows = by_date[date]
             extremes_today = extremes_by_date.get(date, [])
             tide_str = _tide_summary(extremes_today) if extremes_today else ""
             day_label = date.strftime("%A · %b %-d")
-
             wins_html = []
-            for w in sorted(day_windows, key=lambda x: x.start):
-                wins_html.append(f"""
-<div class="window {w.color}">
-  <div class="win-time">{html.escape(_fmt_window_range(w))}</div>
-  <div class="win-detail">{html.escape(_fmt_window_detail(w))}</div>
-  <div class="win-score {w.color}">{int(round(w.peak_hour.score * 100))}</div>
-</div>
-""")
-
-            days_html.append(f"""
-<div class="day">
-  <div class="day-header"><span>{html.escape(day_label)}</span><span class="tide-line">{html.escape(tide_str)}</span></div>
-  {''.join(wins_html)}
-</div>
-""")
-    elif fallback_windows:
-        days_html.append(f"""
-<div class="fallback-note">
-  <strong>Nothing surfable in the next 7 days.</strong>
-  <span class="sub">Here are the {len(fallback_windows)} hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
-</div>
-""")
-        by_date_fb: dict = defaultdict(list)
-        for w in fallback_windows:
-            by_date_fb[w.start.date()].append(w)
-        for date in sorted(by_date_fb.keys()):
-            day_windows = by_date_fb[date]
-            extremes_today = extremes_by_date.get(date, [])
-            tide_str = _tide_summary(extremes_today) if extremes_today else ""
-            day_label = date.strftime("%A · %b %-d")
-
-            wins_html = []
-            for w in sorted(day_windows, key=lambda x: x.start):
-                # Show score as integer even if it's tiny (e.g. "9" or "0")
+            for w in sorted(by_date[date], key=lambda x: x.start):
                 score_pct = int(round(w.peak_hour.score * 100))
                 wins_html.append(f"""
 <div class="window {w.color}">
@@ -223,13 +193,28 @@ def render(
   <div class="win-score {w.color}">{score_pct}</div>
 </div>
 """)
-
-            days_html.append(f"""
+            out.append(f"""
 <div class="day">
   <div class="day-header"><span>{html.escape(day_label)}</span><span class="tide-line">{html.escape(tide_str)}</span></div>
   {''.join(wins_html)}
 </div>
 """)
+        return ''.join(out)
+
+    days_html = []
+    if windows:
+        days_html.append(render_day_groups(windows))
+        if fallback_windows:
+            days_html.append(f"""<div class="section-heading">Next best · sub-threshold (top {len(fallback_windows)})</div>""")
+            days_html.append(render_day_groups(fallback_windows))
+    elif fallback_windows:
+        days_html.append(f"""
+<div class="fallback-note">
+  <strong>Nothing surfable in the next 7 days.</strong>
+  <span class="sub">Here are the {len(fallback_windows)} hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
+</div>
+""")
+        days_html.append(render_day_groups(fallback_windows))
     else:
         days_html.append("""<div class="empty">No data — APIs may be unreachable.<br><span style="font-size:12px">Try refreshing in a few minutes.</span></div>""")
 
@@ -240,7 +225,7 @@ def render(
 <span class="swatch" style="background:var(--light-green)"></span>≥45 good
 <span class="swatch" style="background:var(--yellow)"></span>≥30 decent
 <span class="swatch" style="background:var(--orange)"></span>≥20 marginal
-<span class="swatch" style="background:var(--red)"></span>below 20 — shown only when nothing else qualifies<br>
+<span class="swatch" style="background:var(--red)"></span>below 20 — top 4 next-best alignment windows, always shown for context<br>
 Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
 </div>
 """

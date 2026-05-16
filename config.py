@@ -27,15 +27,15 @@ MIN_WINDOW_HOURS = 2
 
 # --- Score thresholds (color buckets) -----------------------------------------
 # A window's color = bucket(max hourly score in the window).
-# Anything below ORANGE is normally hidden, UNLESS no windows clear orange —
-# then up to RED_FALLBACK_COUNT "least-bad" windows show up red as a sanity
-# check ("the next 7 days are this flat").
+# Anything below ORANGE is normally hidden, BUT the top RED_FALLBACK_COUNT
+# "next best" sub-threshold windows always show up red as situational
+# awareness — so you can see what's coming up even when conditions are flat.
 BRIGHT_GREEN = 0.65
 LIGHT_GREEN = 0.45
 YELLOW = 0.30
 ORANGE = 0.20
 
-RED_FALLBACK_COUNT = 3
+RED_FALLBACK_COUNT = 4
 
 # --- Wave energy calibration --------------------------------------------------
 # Energy proxy = H² × T (height in ft, period in s).

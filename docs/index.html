@@ -71,6 +71,11 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 }
 .fallback-note strong { color: var(--red); }
 .fallback-note .sub { color: var(--muted); font-size: 12px; margin-top: 4px; display: block; }
+.section-heading {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 28px 0 8px;
+}
 .empty {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
@@ -92,20 +97,58 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
 <div class="subtitle">Folly Beach, SC · 7-day outlook</div>
 
 <div class="now">
-  <div class="label">Buoy 41004 · 8:00 AM</div>
-  wind S 8kt
+  <div class="label">Buoy 41004 · 8:20 AM</div>
+  2.6ft @ 8s · swell ESE · wind S 6kt
   <div class="label" style="margin-top:8px">Last updated</div>
-  Sat May 16, 8:38 AM EDT
+  Sat May 16, 8:45 AM EDT
 </div>
 
+
+<div class="fallback-note">
+  <strong>Nothing surfable in the next 7 days.</strong>
+  <span class="sub">Here are the 4 hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
+</div>
+
+<div class="day">
+  <div class="day-header"><span>Saturday · May 16</span><span class="tide-line">L 2:10 AM · H 8:00 AM · L 2:07 PM · H 8:27 PM</span></div>
+  
+<div class="window red">
+  <div class="win-time">7 AM – 1 PM</div>
+  <div class="win-detail">peak 7 AM: 1.8ft @ 7s · swell SE · wind NNW 3kt · rising</div>
+  <div class="win-score red">13</div>
+</div>
+
+</div>
+
+<div class="day">
+  <div class="day-header"><span>Monday · May 18</span><span class="tide-line">L 3:58 AM · H 9:52 AM · L 3:53 PM · H 10:19 PM</span></div>
+  
+<div class="window red">
+  <div class="win-time">7 AM – 3 PM</div>
+  <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SSE · wind SE 4kt · high peak</div>
+  <div class="win-score red">19</div>
+</div>
+
+</div>
 
 <div class="day">
   <div class="day-header"><span>Tuesday · May 19</span><span class="tide-line">L 4:51 AM · H 10:52 AM · L 4:47 PM · H 11:17 PM</span></div>
   
-<div class="window orange">
-  <div class="win-time">10 AM – 12 PM</div>
-  <div class="win-detail">peak 10 AM: 2.4ft @ 8s · swell SE · wind SE 4kt · high peak</div>
-  <div class="win-score orange">21</div>
+<div class="window red">
+  <div class="win-time">7 AM – 4 PM</div>
+  <div class="win-detail">peak 11 AM: 2.4ft @ 8s · swell SE · wind ESE 5kt · high peak</div>
+  <div class="win-score red">19</div>
+</div>
+
+</div>
+
+<div class="day">
+  <div class="day-header"><span>Wednesday · May 20</span><span class="tide-line">L 5:45 AM · H 11:53 AM · L 5:44 PM</span></div>
+  
+<div class="window red">
+  <div class="win-time">8 AM – 5 PM</div>
+  <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SE · wind NNW 1kt · rising</div>
+  <div class="win-score red">26</div>
 </div>
 
 </div>
@@ -117,7 +160,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
 <span class="swatch" style="background:var(--light-green)"></span>≥45 good
 <span class="swatch" style="background:var(--yellow)"></span>≥30 decent
 <span class="swatch" style="background:var(--orange)"></span>≥20 marginal
-<span class="swatch" style="background:var(--red)"></span>below 20 — shown only when nothing else qualifies<br>
+<span class="swatch" style="background:var(--red)"></span>below 20 — top 4 next-best alignment windows, always shown for context<br>
 Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
 </div>
 

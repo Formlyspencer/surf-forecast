@@ -317,8 +317,12 @@ def find_windows(hours: list[Hour]) -> list[Window]:
     return windows
 
 
-def find_fallback_windows(hours: list[Hour], n: int | None = None) -> list[Window]:
-    """Surface the 'least-bad' windows when no real windows clear orange.
+def find_fallback_windows(
+    hours: list[Hour],
+    n: int | None = None,
+    exclude_times: set | None = None,
+) -> list[Window]:
+    """Surface the top N 'next-best' sub-threshold windows.
 
     Groups consecutive hours where non-wave factors don't zero out (so swell
     direction is in the acceptable arc, tide isn't no-go low, wind isn't pure
@@ -326,10 +330,13 @@ def find_fallback_windows(hours: list[Hour], n: int | None = None) -> list[Windo
     returns the top N (default config.RED_FALLBACK_COUNT). All returned
     windows are tagged "red".
 
-    Use only when find_windows() returns empty.
+    `exclude_times` is an optional set of datetimes (typically hours already
+    covered by real find_windows() output) to skip — avoids double-displaying
+    the same hours as both real and red windows.
     """
     if n is None:
         n = config.RED_FALLBACK_COUNT
+    exclude_times = exclude_times or set()
 
     runs: list[list[Hour]] = []
     run: list[Hour] = []
@@ -342,6 +349,11 @@ def find_fallback_windows(hours: list[Hour], n: int | None = None) -> list[Windo
             runs.append(list(run))
 
     for h in hours:
+        # Skip hours already covered by real windows
+        if h.t in exclude_times:
+            flush()
+            run = []
+            continue
         # Require at least minimal alignment — skip hours where any non-wave
         # factor is zero (crossshore wind, low-tide nogo, swell out of arc)
         if _alignment(h) < 0.05:
