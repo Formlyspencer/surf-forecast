@@ -10,20 +10,22 @@ import render
 
 def main():
     from datetime import timedelta
+    import config
 
     bundle = fetch.fetch_all()
     hours = score.build_hours(bundle)
     windows = score.find_windows(hours)
 
-    # Build the set of hour-timestamps already covered by real windows so we
-    # don't double-display them as red windows.
+    # Top up to MIN_TOTAL_WINDOWS by adding red fallback windows, deduped
+    # against hours already covered by the real windows.
+    n_red = max(0, config.MIN_TOTAL_WINDOWS - len(windows))
     covered = set()
     for w in windows:
         cur = w.start
         while cur < w.end:
             covered.add(cur)
             cur += timedelta(hours=1)
-    fallback = score.find_fallback_windows(hours, exclude_times=covered)
+    fallback = score.find_fallback_windows(hours, n=n_red, exclude_times=covered)
 
     html = render.render(
         windows=windows,

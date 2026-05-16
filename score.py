@@ -335,7 +335,9 @@ def find_fallback_windows(
     the same hours as both real and red windows.
     """
     if n is None:
-        n = config.RED_FALLBACK_COUNT
+        n = config.MIN_TOTAL_WINDOWS
+    if n <= 0:
+        return []
     exclude_times = exclude_times or set()
 
     runs: list[list[Hour]] = []

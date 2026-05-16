@@ -205,7 +205,7 @@ def render(
     if windows:
         days_html.append(render_day_groups(windows))
         if fallback_windows:
-            days_html.append(f"""<div class="section-heading">Next best · sub-threshold (top {len(fallback_windows)})</div>""")
+            days_html.append(f"""<div class="section-heading">Next best · sub-threshold</div>""")
             days_html.append(render_day_groups(fallback_windows))
     elif fallback_windows:
         days_html.append(f"""
@@ -225,7 +225,7 @@ def render(
 <span class="swatch" style="background:var(--light-green)"></span>≥45 good
 <span class="swatch" style="background:var(--yellow)"></span>≥30 decent
 <span class="swatch" style="background:var(--orange)"></span>≥20 marginal
-<span class="swatch" style="background:var(--red)"></span>below 20 — top 4 next-best alignment windows, always shown for context<br>
+<span class="swatch" style="background:var(--red)"></span>below 20 — shown as filler so the page always lists at least 5 windows<br>
 Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0–1, multiplied).
 </div>
 """
