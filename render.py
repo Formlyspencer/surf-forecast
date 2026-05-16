@@ -71,8 +71,9 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .tide-spark .tide-line { fill: none; stroke: var(--muted); stroke-width: 1.5; }
 .tide-spark text { font-size: 9px; fill: var(--muted); font-family: ui-monospace, monospace; }
 .metric-bars { display: grid; grid-template-columns: 1fr; gap: 6px; }
-.metric-bar { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+.metric-bar { display: grid; grid-template-columns: 38px 14px 1fr 42px; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
 .metric-bar .label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-bar .dir-arrow { display: block; color: var(--text); }
 .metric-bar .track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .metric-bar .fill { height: 100%; border-radius: 3px; }
 .metric-bar .value { font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; font-size: 11px; }
@@ -212,34 +213,61 @@ def _tide_sparkline(window: Window, extremes: list[dict], color_var: str) -> str
 </svg>'''
 
 
+def _direction_arrow(from_deg: float | None, size: int = 14) -> str:
+    """Inline SVG arrow that points in the direction the thing is *going*.
+
+    Meteorological convention reports direction-FROM (wind from SE, swell from
+    SE), but visually pointing where it's headed is more intuitive — that's
+    the direction the energy is travelling toward the beach. So we rotate
+    by (from_deg + 180°). Default arrow points up (north = 0°); a rotation
+    of 90° points it east (right).
+    """
+    if from_deg is None:
+        return f'<svg class="dir-arrow" width="{size}" height="{size}" viewBox="0 0 12 12"></svg>'
+    to_deg = (from_deg + 180) % 360
+    return (
+        f'<svg class="dir-arrow" width="{size}" height="{size}" viewBox="0 0 12 12">'
+        f'<path d="M6 1 L10 10 L6 7.5 L2 10 Z" '
+        f'transform="rotate({to_deg:.0f} 6 6)" fill="currentColor"/>'
+        f'</svg>'
+    )
+
+
 def _metric_bars(
     wave_ft: float | None,
     period_s: float | None,
     wind_kt: float | None,
+    swell_dir: float | None,
+    wind_dir: float | None,
     color_var: str,
 ) -> str:
     """Three stacked bars: wave height (0-6ft), period (0-15s), wind speed (0-25kt).
 
-    All bars use the window's color for the fill. Note that a *longer* wind bar
-    means *more* wind (potentially worse) — opposite intuition to wave/period
-    where longer = bigger = potentially better. We keep the same visual to
-    stay consistent; the number on the right is the unambiguous signal.
+    Each bar gets a directional arrow next to the label:
+    - Wave & Period arrows point in the swell's travel direction (swell_dir + 180°)
+    - Wind arrow points in the wind's travel direction (wind_dir + 180°)
+
+    All bar fills use the window's color. A longer wind bar means more wind
+    (potentially worse) — opposite to wave/period intuition — but the kt
+    value on the right is unambiguous.
     """
     rows = [
-        ("Wave", wave_ft, WAVE_BAR_MAX_FT, "ft", 1),
-        ("Period", period_s, PERIOD_BAR_MAX_S, "s", 0),
-        ("Wind", wind_kt, WIND_BAR_MAX_KT, "kt", 0),
+        ("Wave", wave_ft, WAVE_BAR_MAX_FT, "ft", 1, swell_dir),
+        ("Period", period_s, PERIOD_BAR_MAX_S, "s", 0, swell_dir),
+        ("Wind", wind_kt, WIND_BAR_MAX_KT, "kt", 0, wind_dir),
     ]
     html_rows = []
-    for label, value, scale_max, unit, decimals in rows:
+    for label, value, scale_max, unit, decimals, dir_deg in rows:
         if value is None:
             pct = 0
             display = "—"
         else:
             pct = min(100, (value / scale_max) * 100)
             display = f"{value:.{decimals}f} {unit}"
+        arrow_svg = _direction_arrow(dir_deg)
         html_rows.append(f'''<div class="metric-bar">
     <span class="label">{label}</span>
+    {arrow_svg}
     <div class="track"><div class="fill" style="width:{pct:.0f}%;background:var({color_var})"></div></div>
     <span class="value">{html.escape(display)}</span>
   </div>''')
@@ -340,6 +368,8 @@ def render(
                     w.peak_hour.wave_h_ft,
                     w.peak_hour.wave_T,
                     w.peak_hour.wind_kt,
+                    w.peak_hour.swell_dir,
+                    w.peak_hour.wind_dir,
                     color_var,
                 )
                 wins_html.append(f"""

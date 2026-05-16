@@ -60,8 +60,9 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .tide-spark .tide-line { fill: none; stroke: var(--muted); stroke-width: 1.5; }
 .tide-spark text { font-size: 9px; fill: var(--muted); font-family: ui-monospace, monospace; }
 .metric-bars { display: grid; grid-template-columns: 1fr; gap: 6px; }
-.metric-bar { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+.metric-bar { display: grid; grid-template-columns: 38px 14px 1fr 42px; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
 .metric-bar .label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-bar .dir-arrow { display: block; color: var(--text); }
 .metric-bar .track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .metric-bar .fill { height: 100%; border-radius: 3px; }
 .metric-bar .value { font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; font-size: 11px; }
@@ -117,7 +118,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="label">Buoy 41004 · 10:20 AM</div>
   2.6ft @ 8s · swell ESE · wind SSE 4kt
   <div class="label" style="margin-top:8px">Last updated</div>
-  Sat May 16, 10:42 AM EDT
+  Sat May 16, 10:49 AM EDT
 </div>
 
 
@@ -140,16 +141,19 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
     <div class="metric-bars">
   <div class="metric-bar">
     <span class="label">Wave</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(329 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
     <span class="value">2.4 ft</span>
   </div>
 <div class="metric-bar">
     <span class="label">Period</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(329 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:51%;background:var(--orange)"></div></div>
     <span class="value">8 s</span>
   </div>
 <div class="metric-bar">
     <span class="label">Wind</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(319 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:18%;background:var(--orange)"></div></div>
     <span class="value">4 kt</span>
   </div>
@@ -178,16 +182,19 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
     <div class="metric-bars">
   <div class="metric-bar">
     <span class="label">Wave</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(310 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
     <span class="value">2.4 ft</span>
   </div>
 <div class="metric-bar">
     <span class="label">Period</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(310 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:54%;background:var(--orange)"></div></div>
     <span class="value">8 s</span>
   </div>
 <div class="metric-bar">
     <span class="label">Wind</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(294 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:21%;background:var(--orange)"></div></div>
     <span class="value">5 kt</span>
   </div>
@@ -216,16 +223,19 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
     <div class="metric-bars">
   <div class="metric-bar">
     <span class="label">Wave</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(309 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
     <span class="value">2.4 ft</span>
   </div>
 <div class="metric-bar">
     <span class="label">Period</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(309 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:55%;background:var(--orange)"></div></div>
     <span class="value">8 s</span>
   </div>
 <div class="metric-bar">
     <span class="label">Wind</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(162 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:2%;background:var(--orange)"></div></div>
     <span class="value">1 kt</span>
   </div>
@@ -254,16 +264,19 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
     <div class="metric-bars">
   <div class="metric-bar">
     <span class="label">Wave</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(315 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:43%;background:var(--orange)"></div></div>
     <span class="value">2.6 ft</span>
   </div>
 <div class="metric-bar">
     <span class="label">Period</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(315 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:57%;background:var(--orange)"></div></div>
     <span class="value">9 s</span>
   </div>
 <div class="metric-bar">
     <span class="label">Wind</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(355 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:25%;background:var(--orange)"></div></div>
     <span class="value">6 kt</span>
   </div>
@@ -292,16 +305,19 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
     <div class="metric-bars">
   <div class="metric-bar">
     <span class="label">Wave</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(305 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:31%;background:var(--red)"></div></div>
     <span class="value">1.8 ft</span>
   </div>
 <div class="metric-bar">
     <span class="label">Period</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(305 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:48%;background:var(--red)"></div></div>
     <span class="value">7 s</span>
   </div>
 <div class="metric-bar">
     <span class="label">Wind</span>
+    <svg class="dir-arrow" width="14" height="14" viewBox="0 0 12 12"><path d="M6 1 L10 10 L6 7.5 L2 10 Z" transform="rotate(117 6 6)" fill="currentColor"/></svg>
     <div class="track"><div class="fill" style="width:5%;background:var(--red)"></div></div>
     <span class="value">1 kt</span>
   </div>
