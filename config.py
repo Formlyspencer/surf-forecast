@@ -39,6 +39,7 @@ YELLOW = 0.30
 ORANGE = 0.18
 
 MIN_TOTAL_WINDOWS = 5
+DEEP_DIVE_TOTAL_WINDOWS = 20  # bottom collapsible "next 20 sessions" view
 
 # --- Wave energy calibration --------------------------------------------------
 # Energy proxy = H² × T (height in ft, period in s).

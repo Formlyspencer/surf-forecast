@@ -105,6 +105,24 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.06em;
   margin: 28px 0 8px;
 }
+.deep-dive {
+  margin-top: 28px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+.deep-dive > summary {
+  cursor: pointer; padding: 14px 16px;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  list-style: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.deep-dive > summary::-webkit-details-marker { display: none; }
+.deep-dive > summary::after {
+  content: "▸"; color: var(--muted); transition: transform 0.15s ease;
+}
+.deep-dive[open] > summary::after { transform: rotate(90deg); }
+.deep-dive > summary .sub { color: var(--muted); font-weight: 400; font-size: 11px; margin-left: 8px; }
+.deep-dive .deep-body { padding: 0 16px 16px; }
 .empty {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; padding: 20px; text-align: center; color: var(--muted);
@@ -336,14 +354,22 @@ def _now_panel(buoy, fetched_at: datetime) -> str:
 
 
 def render(
-    windows: list[Window],
+    top_windows: list[Window],
+    deep_dive_windows: list[Window],
+    any_real: bool,
     extremes: list[dict],
     buoy,
     fetched_at: datetime,
-    fallback_windows: list[Window] | None = None,
 ) -> str:
+    """Render the static HTML.
+
+    top_windows: top ~5 windows for the main view, sorted chronologically.
+    deep_dive_windows: top ~20 for the collapsible deep-dive, also sorted
+        chronologically.
+    any_real: whether any of the windows are real (≥ ORANGE). When False,
+        a "nothing surfable" callout appears above the top view.
+    """
     tz = ZoneInfo(config.TZ)
-    fallback_windows = fallback_windows or []
 
     extremes_by_date: dict = defaultdict(list)
     for e in extremes:
@@ -394,21 +420,29 @@ def render(
         return ''.join(out)
 
     days_html = []
-    if windows:
-        days_html.append(render_day_groups(windows))
-        if fallback_windows:
-            days_html.append(f"""<div class="section-heading">Next best · sub-threshold</div>""")
-            days_html.append(render_day_groups(fallback_windows))
-    elif fallback_windows:
-        days_html.append(f"""
+    if not top_windows:
+        days_html.append("""<div class="empty">No data — APIs may be unreachable.<br><span style="font-size:12px">Try refreshing in a few minutes.</span></div>""")
+    else:
+        if not any_real:
+            days_html.append(f"""
 <div class="fallback-note">
   <strong>Nothing surfable in the next 7 days.</strong>
-  <span class="sub">Here are the {len(fallback_windows)} hours where the swell, wind, and tide come closest to lining up — but the wave size is too small to make it worth paddling out. Scores in red.</span>
+  <span class="sub">All windows below are sub-threshold — the swell, wind, and tide come close to lining up, but the wave size is too small to make it worth paddling out.</span>
 </div>
 """)
-        days_html.append(render_day_groups(fallback_windows))
-    else:
-        days_html.append("""<div class="empty">No data — APIs may be unreachable.<br><span style="font-size:12px">Try refreshing in a few minutes.</span></div>""")
+        days_html.append(render_day_groups(top_windows))
+
+    # Collapsible deep-dive: top 20 sessions chronologically
+    deep_dive_html = ""
+    if deep_dive_windows and len(deep_dive_windows) > len(top_windows):
+        deep_dive_html = f"""
+<details class="deep-dive">
+  <summary>View next {len(deep_dive_windows)} sessions<span class="sub">further out · lower quality further down</span></summary>
+  <div class="deep-body">
+    {render_day_groups(deep_dive_windows)}
+  </div>
+</details>
+"""
 
     legend = """
 <div class="legend">
@@ -436,6 +470,7 @@ Score = wave · swell-direction · wind-direction · wind-speed · tide (each 0�
 <div class="subtitle">{html.escape(config.SPOT_NAME)} · {config.FORECAST_DAYS}-day outlook</div>
 {_now_panel(buoy, fetched_at)}
 {''.join(days_html)}
+{deep_dive_html}
 {legend}
 <footer>Data: Open-Meteo (waves + wind), NOAA CO-OPS station {config.TIDE_STATION} (tides), NDBC buoy {config.NDBC_BUOY} (current obs). Page auto-refreshes every 15 min.</footer>
 </body>
