@@ -45,9 +45,26 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .window {
   background: var(--panel); border-left: 4px solid;
   border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+}
+.win-header {
   display: grid; grid-template-columns: auto 1fr auto; gap: 12px;
   align-items: center;
 }
+.win-visuals {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+}
+.tide-spark { width: 100%; height: 38px; display: block; }
+.tide-spark .tide-line { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+.tide-spark .tide-now { stroke-width: 2; }
+.tide-spark text { font-size: 9px; fill: var(--muted); font-family: ui-monospace, monospace; }
+.metric-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.metric-bar { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.metric-bar .label { min-width: 38px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; }
+.metric-bar .track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.metric-bar .fill { height: 100%; border-radius: 3px; }
+.metric-bar .value { font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; color: var(--text); font-weight: 600; }
 .window.bright-green { border-left-color: var(--bright-green); }
 .window.light-green  { border-left-color: var(--light-green); }
 .window.yellow       { border-left-color: var(--yellow); }
@@ -97,10 +114,10 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
 <div class="subtitle">Folly Beach, SC · 7-day outlook</div>
 
 <div class="now">
-  <div class="label">Buoy 41004 · 9:30 AM</div>
-  wind S 6kt
+  <div class="label">Buoy 41004 · 10:00 AM</div>
+  wind SSE 4kt
   <div class="label" style="margin-top:8px">Last updated</div>
-  Sat May 16, 10:01 AM EDT
+  Sat May 16, 10:29 AM EDT
 </div>
 
 
@@ -108,9 +125,31 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="day-header"><span>Monday · May 18</span><span class="tide-line">L 3:58 AM · H 9:52 AM · L 3:53 PM · H 10:19 PM</span></div>
   
 <div class="window orange">
-  <div class="win-time">9 AM – 11 AM</div>
-  <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SSE · wind SE 4kt · high peak</div>
-  <div class="win-score orange">19</div>
+  <div class="win-header">
+    <div class="win-time">9 AM – 11 AM</div>
+    <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SSE · wind SE 4kt · high peak</div>
+    <div class="win-score orange">19</div>
+  </div>
+  <div class="win-visuals">
+    <svg class="tide-spark" viewBox="0 0 320 38" preserveAspectRatio="none">
+<rect x="120.0" y="0" width="80.0" height="26.0" fill="var(--orange)" opacity="0.18"/>
+<path class="tide-line" d="M0.0,23.9 L10.0,22.2 L20.0,20.5 L30.0,18.7 L40.0,16.9 L50.0,15.1 L60.0,13.4 L70.0,11.7 L80.0,10.1 L90.0,8.7 L100.0,7.4 L110.0,6.3 L120.0,5.4 L130.0,4.7 L140.0,4.2 L150.0,4.0 L160.0,4.0 L170.0,4.3 L180.0,4.7 L190.0,5.5 L200.0,6.4 L210.0,7.5 L220.0,8.8 L230.0,10.3 L240.0,11.9 L250.0,13.6 L260.0,15.4 L270.0,17.2 L280.0,19.1 L290.0,20.9 L300.0,22.7 L310.0,24.4 L320.0,26.0"/>
+<circle cx="154.7" cy="4.0" r="2.5" fill="var(--muted)"/><text x="154.7" y="14.0" text-anchor="middle">H</text>
+<text x="120.0" y="36.0" text-anchor="middle">9 AM</text><text x="200.0" y="36.0" text-anchor="middle">11 AM</text>
+</svg>
+    <div class="metric-bars">
+  <div class="metric-bar">
+    <span class="label">Wave</span>
+    <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
+    <span class="value">2.4 ft</span>
+  </div>
+  <div class="metric-bar">
+    <span class="label">Period</span>
+    <div class="track"><div class="fill" style="width:51%;background:var(--orange)"></div></div>
+    <span class="value">8 s</span>
+  </div>
+</div>
+  </div>
 </div>
 
 </div>
@@ -119,9 +158,31 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="day-header"><span>Tuesday · May 19</span><span class="tide-line">L 4:51 AM · H 10:52 AM · L 4:47 PM · H 11:17 PM</span></div>
   
 <div class="window orange">
-  <div class="win-time">9 AM – 12 PM</div>
-  <div class="win-detail">peak 11 AM: 2.4ft @ 8s · swell SE · wind ESE 5kt · high peak</div>
-  <div class="win-score orange">19</div>
+  <div class="win-header">
+    <div class="win-time">9 AM – 12 PM</div>
+    <div class="win-detail">peak 11 AM: 2.4ft @ 8s · swell SE · wind ESE 5kt · high peak</div>
+    <div class="win-score orange">19</div>
+  </div>
+  <div class="win-visuals">
+    <svg class="tide-spark" viewBox="0 0 320 38" preserveAspectRatio="none">
+<rect x="106.7" y="0" width="106.7" height="26.0" fill="var(--orange)" opacity="0.18"/>
+<path class="tide-line" d="M0.0,26.0 L8.9,25.0 L17.8,23.9 L26.7,22.6 L35.6,21.3 L44.4,19.8 L53.3,18.3 L62.2,16.7 L71.1,15.2 L80.0,13.6 L88.9,12.1 L97.8,10.6 L106.7,9.3 L115.6,8.0 L124.4,6.9 L133.3,6.0 L142.2,5.2 L151.1,4.6 L160.0,4.2 L168.9,4.0 L177.8,4.0 L186.7,4.2 L195.6,4.7 L204.4,5.3 L213.3,6.2 L222.2,7.2 L231.1,8.4 L240.0,9.7 L248.9,11.1 L257.8,12.7 L266.7,14.3 L275.6,15.9 L284.4,17.5 L293.3,19.2 L302.2,20.7 L311.1,22.2 L320.0,23.6"/>
+<circle cx="173.0" cy="4.0" r="2.5" fill="var(--muted)"/><text x="173.0" y="14.0" text-anchor="middle">H</text>
+<text x="106.7" y="36.0" text-anchor="middle">9 AM</text><text x="213.3" y="36.0" text-anchor="middle">12 PM</text>
+</svg>
+    <div class="metric-bars">
+  <div class="metric-bar">
+    <span class="label">Wave</span>
+    <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
+    <span class="value">2.4 ft</span>
+  </div>
+  <div class="metric-bar">
+    <span class="label">Period</span>
+    <div class="track"><div class="fill" style="width:54%;background:var(--orange)"></div></div>
+    <span class="value">8 s</span>
+  </div>
+</div>
+  </div>
 </div>
 
 </div>
@@ -130,9 +191,31 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="day-header"><span>Wednesday · May 20</span><span class="tide-line">L 5:45 AM · H 11:53 AM · L 5:44 PM</span></div>
   
 <div class="window orange">
-  <div class="win-time">9 AM – 1 PM</div>
-  <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SE · wind NNW 1kt · rising</div>
-  <div class="win-score orange">26</div>
+  <div class="win-header">
+    <div class="win-time">9 AM – 1 PM</div>
+    <div class="win-detail">peak 9 AM: 2.4ft @ 8s · swell SE · wind NNW 1kt · rising</div>
+    <div class="win-score orange">26</div>
+  </div>
+  <div class="win-visuals">
+    <svg class="tide-spark" viewBox="0 0 320 38" preserveAspectRatio="none">
+<rect x="96.0" y="0" width="128.0" height="26.0" fill="var(--orange)" opacity="0.18"/>
+<path class="tide-line" d="M0.0,26.0 L8.0,25.7 L16.0,25.3 L24.0,24.7 L32.0,23.9 L40.0,23.0 L48.0,21.9 L56.0,20.8 L64.0,19.5 L72.0,18.2 L80.0,16.8 L88.0,15.4 L96.0,14.0 L104.0,12.6 L112.0,11.2 L120.0,9.9 L128.0,8.7 L136.0,7.6 L144.0,6.6 L152.0,5.8 L160.0,5.1 L168.0,4.6 L176.0,4.2 L184.0,4.0 L192.0,4.0 L200.0,4.2 L208.0,4.6 L216.0,5.2 L224.0,5.9 L232.0,6.8 L240.0,7.9 L248.0,9.1 L256.0,10.4 L264.0,11.8 L272.0,13.3 L280.0,14.8 L288.0,16.3 L296.0,17.7 L304.0,19.2 L312.0,20.5 L320.0,21.8"/>
+<circle cx="188.3" cy="4.0" r="2.5" fill="var(--muted)"/><text x="188.3" y="14.0" text-anchor="middle">H</text>
+<text x="96.0" y="36.0" text-anchor="middle">9 AM</text><text x="224.0" y="36.0" text-anchor="middle">1 PM</text>
+</svg>
+    <div class="metric-bars">
+  <div class="metric-bar">
+    <span class="label">Wave</span>
+    <div class="track"><div class="fill" style="width:40%;background:var(--orange)"></div></div>
+    <span class="value">2.4 ft</span>
+  </div>
+  <div class="metric-bar">
+    <span class="label">Period</span>
+    <div class="track"><div class="fill" style="width:55%;background:var(--orange)"></div></div>
+    <span class="value">8 s</span>
+  </div>
+</div>
+  </div>
 </div>
 
 </div>
@@ -141,9 +224,31 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="day-header"><span>Thursday · May 21</span><span class="tide-line">H 12:17 AM · L 6:42 AM · H 12:56 PM · L 6:46 PM</span></div>
   
 <div class="window orange">
-  <div class="win-time">12 PM – 2 PM</div>
-  <div class="win-detail">peak 12 PM: 2.6ft @ 9s · swell SE · wind S 6kt · high peak</div>
-  <div class="win-score orange">18</div>
+  <div class="win-header">
+    <div class="win-time">12 PM – 2 PM</div>
+    <div class="win-detail">peak 12 PM: 2.6ft @ 9s · swell SE · wind S 6kt · high peak</div>
+    <div class="win-score orange">18</div>
+  </div>
+  <div class="win-visuals">
+    <svg class="tide-spark" viewBox="0 0 320 38" preserveAspectRatio="none">
+<rect x="120.0" y="0" width="80.0" height="26.0" fill="var(--orange)" opacity="0.18"/>
+<path class="tide-line" d="M0.0,23.8 L10.0,22.1 L20.0,20.4 L30.0,18.6 L40.0,16.8 L50.0,15.1 L60.0,13.4 L70.0,11.7 L80.0,10.2 L90.0,8.8 L100.0,7.5 L110.0,6.4 L120.0,5.5 L130.0,4.8 L140.0,4.3 L150.0,4.1 L160.0,4.0 L170.0,4.2 L180.0,4.6 L190.0,5.3 L200.0,6.2 L210.0,7.3 L220.0,8.7 L230.0,10.1 L240.0,11.8 L250.0,13.5 L260.0,15.3 L270.0,17.2 L280.0,19.0 L290.0,20.9 L300.0,22.7 L310.0,24.4 L320.0,26.0"/>
+<circle cx="157.3" cy="4.0" r="2.5" fill="var(--muted)"/><text x="157.3" y="14.0" text-anchor="middle">H</text>
+<text x="120.0" y="36.0" text-anchor="middle">12 PM</text><text x="200.0" y="36.0" text-anchor="middle">2 PM</text>
+</svg>
+    <div class="metric-bars">
+  <div class="metric-bar">
+    <span class="label">Wave</span>
+    <div class="track"><div class="fill" style="width:43%;background:var(--orange)"></div></div>
+    <span class="value">2.6 ft</span>
+  </div>
+  <div class="metric-bar">
+    <span class="label">Period</span>
+    <div class="track"><div class="fill" style="width:57%;background:var(--orange)"></div></div>
+    <span class="value">9 s</span>
+  </div>
+</div>
+  </div>
 </div>
 
 </div>
@@ -152,9 +257,31 @@ footer { font-size: 11px; color: var(--muted); margin-top: 32px; text-align: cen
   <div class="day-header"><span>Saturday · May 16</span><span class="tide-line">L 2:10 AM · H 8:00 AM · L 2:07 PM · H 8:27 PM</span></div>
   
 <div class="window red">
-  <div class="win-time">7 AM – 1 PM</div>
-  <div class="win-detail">peak 7 AM: 1.8ft @ 7s · swell SE · wind WNW 1kt · rising</div>
-  <div class="win-score red">14</div>
+  <div class="win-header">
+    <div class="win-time">7 AM – 1 PM</div>
+    <div class="win-detail">peak 7 AM: 1.8ft @ 7s · swell SE · wind WNW 1kt · rising</div>
+    <div class="win-score red">14</div>
+  </div>
+  <div class="win-visuals">
+    <svg class="tide-spark" viewBox="0 0 320 38" preserveAspectRatio="none">
+<rect x="80.0" y="0" width="160.0" height="26.0" fill="var(--red)" opacity="0.18"/>
+<path class="tide-line" d="M0.0,19.8 L6.7,18.6 L13.3,17.3 L20.0,16.0 L26.7,14.6 L33.3,13.3 L40.0,11.9 L46.7,10.6 L53.3,9.3 L60.0,8.2 L66.7,7.1 L73.3,6.2 L80.0,5.4 L86.7,4.8 L93.3,4.4 L100.0,4.1 L106.7,4.0 L113.3,4.1 L120.0,4.4 L126.7,4.8 L133.3,5.4 L140.0,6.2 L146.7,7.1 L153.3,8.2 L160.0,9.3 L166.7,10.6 L173.3,11.9 L180.0,13.3 L186.7,14.7 L193.3,16.1 L200.0,17.5 L206.7,18.8 L213.3,20.1 L220.0,21.3 L226.7,22.4 L233.3,23.4 L240.0,24.3 L246.7,24.9 L253.3,25.5 L260.0,25.8 L266.7,26.0 L273.3,26.0 L280.0,25.8 L286.7,25.3 L293.3,24.7 L300.0,23.9 L306.7,22.9 L313.3,21.7 L320.0,20.4"/>
+<circle cx="106.7" cy="4.0" r="2.5" fill="var(--muted)"/><text x="106.7" y="14.0" text-anchor="middle">H</text><circle cx="269.8" cy="26.0" r="2.5" fill="var(--muted)"/><text x="269.8" y="21.0" text-anchor="middle">L</text>
+<text x="80.0" y="36.0" text-anchor="middle">7 AM</text><text x="240.0" y="36.0" text-anchor="middle">1 PM</text>
+</svg>
+    <div class="metric-bars">
+  <div class="metric-bar">
+    <span class="label">Wave</span>
+    <div class="track"><div class="fill" style="width:31%;background:var(--red)"></div></div>
+    <span class="value">1.8 ft</span>
+  </div>
+  <div class="metric-bar">
+    <span class="label">Period</span>
+    <div class="track"><div class="fill" style="width:48%;background:var(--red)"></div></div>
+    <span class="value">7 s</span>
+  </div>
+</div>
+  </div>
 </div>
 
 </div>
