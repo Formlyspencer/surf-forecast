@@ -25,7 +25,14 @@ def _get_json(url: str) -> dict:
 
 
 def fetch_marine() -> dict:
-    """Hourly swell forecast for FORECAST_DAYS days."""
+    """Hourly swell forecast for FORECAST_DAYS days.
+
+    Uses NCEP GFS-Wave (0.25°) — the same model NOAA and Surfline reference,
+    so the wave height + period shown here align with the numbers Spencer
+    sees on NOAA AMZ360 and Surfline. (Open-Meteo's default ECMWF model
+    reports mean period, which runs ~2s shorter than the peak period those
+    other sources report.)
+    """
     params = {
         "latitude": config.LAT,
         "longitude": config.LON,
@@ -33,6 +40,7 @@ def fetch_marine() -> dict:
             "wave_height", "wave_direction", "wave_period",
             "swell_wave_height", "swell_wave_direction", "swell_wave_period",
         ]),
+        "models": "ncep_gfswave025",
         "length_unit": "imperial",
         "timezone": config.TZ,
         "forecast_days": config.FORECAST_DAYS,
