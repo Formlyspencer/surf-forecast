@@ -11,8 +11,9 @@ import config
 from score import Hour, Window
 
 # Bar scales — pick maxima that cover Folly's realistic range
-WAVE_BAR_MAX_FT = 6.0   # 0-6ft covers ~99% of Folly conditions
-PERIOD_BAR_MAX_S = 15.0  # 0-15s covers tropical-grade ground swell
+WAVE_BAR_MAX_FT = 6.0     # 0-6ft covers ~99% of Folly conditions
+PERIOD_BAR_MAX_S = 15.0   # 0-15s covers tropical-grade ground swell
+WIND_BAR_MAX_KT = 25.0    # 25kt is well past blown-out
 
 
 CSS = """
@@ -63,18 +64,18 @@ h2 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); font-weight: 600;
 .win-visuals {
   margin-top: 10px; padding-top: 10px;
   border-top: 1px solid var(--border);
-  display: grid; grid-template-columns: 1fr; gap: 8px;
+  display: grid; grid-template-columns: 3fr 2fr; gap: 14px;
+  align-items: center;
 }
-.tide-spark { width: 100%; height: 38px; display: block; }
+.tide-spark { width: 100%; height: 68px; display: block; }
 .tide-spark .tide-line { fill: none; stroke: var(--muted); stroke-width: 1.5; }
-.tide-spark .tide-now { stroke-width: 2; }
 .tide-spark text { font-size: 9px; fill: var(--muted); font-family: ui-monospace, monospace; }
-.metric-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.metric-bar { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
-.metric-bar .label { min-width: 38px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; }
-.metric-bar .track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.metric-bars { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.metric-bar { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+.metric-bar .label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-bar .track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .metric-bar .fill { height: 100%; border-radius: 3px; }
-.metric-bar .value { font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; color: var(--text); font-weight: 600; }
+.metric-bar .value { font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; font-size: 11px; }
 .window.bright-green { border-left-color: var(--bright-green); }
 .window.light-green  { border-left-color: var(--light-green); }
 .window.yellow       { border-left-color: var(--yellow); }
@@ -211,24 +212,38 @@ def _tide_sparkline(window: Window, extremes: list[dict], color_var: str) -> str
 </svg>'''
 
 
-def _metric_bars(wave_ft: float | None, period_s: float | None, color_var: str) -> str:
-    """Two stacked-ish bars for wave height (0-6ft) and period (0-15s)."""
-    wave_pct = min(100, ((wave_ft or 0) / WAVE_BAR_MAX_FT) * 100)
-    period_pct = min(100, ((period_s or 0) / PERIOD_BAR_MAX_S) * 100)
-    wave_label = f"{wave_ft:.1f} ft" if wave_ft is not None else "—"
-    period_label = f"{period_s:.0f} s" if period_s is not None else "—"
-    return f'''<div class="metric-bars">
-  <div class="metric-bar">
-    <span class="label">Wave</span>
-    <div class="track"><div class="fill" style="width:{wave_pct:.0f}%;background:var({color_var})"></div></div>
-    <span class="value">{wave_label}</span>
-  </div>
-  <div class="metric-bar">
-    <span class="label">Period</span>
-    <div class="track"><div class="fill" style="width:{period_pct:.0f}%;background:var({color_var})"></div></div>
-    <span class="value">{period_label}</span>
-  </div>
-</div>'''
+def _metric_bars(
+    wave_ft: float | None,
+    period_s: float | None,
+    wind_kt: float | None,
+    color_var: str,
+) -> str:
+    """Three stacked bars: wave height (0-6ft), period (0-15s), wind speed (0-25kt).
+
+    All bars use the window's color for the fill. Note that a *longer* wind bar
+    means *more* wind (potentially worse) — opposite intuition to wave/period
+    where longer = bigger = potentially better. We keep the same visual to
+    stay consistent; the number on the right is the unambiguous signal.
+    """
+    rows = [
+        ("Wave", wave_ft, WAVE_BAR_MAX_FT, "ft", 1),
+        ("Period", period_s, PERIOD_BAR_MAX_S, "s", 0),
+        ("Wind", wind_kt, WIND_BAR_MAX_KT, "kt", 0),
+    ]
+    html_rows = []
+    for label, value, scale_max, unit, decimals in rows:
+        if value is None:
+            pct = 0
+            display = "—"
+        else:
+            pct = min(100, (value / scale_max) * 100)
+            display = f"{value:.{decimals}f} {unit}"
+        html_rows.append(f'''<div class="metric-bar">
+    <span class="label">{label}</span>
+    <div class="track"><div class="fill" style="width:{pct:.0f}%;background:var({color_var})"></div></div>
+    <span class="value">{html.escape(display)}</span>
+  </div>''')
+    return f'<div class="metric-bars">\n  {chr(10).join(html_rows)}\n</div>'
 
 
 def _cardinal(deg: float | None) -> str:
@@ -321,7 +336,12 @@ def render(
                 score_pct = int(round(w.peak_hour.score * 100))
                 color_var = f"--{w.color}"
                 tide_svg = _tide_sparkline(w, extremes, color_var)
-                bars_html = _metric_bars(w.peak_hour.wave_h_ft, w.peak_hour.wave_T, color_var)
+                bars_html = _metric_bars(
+                    w.peak_hour.wave_h_ft,
+                    w.peak_hour.wave_T,
+                    w.peak_hour.wind_kt,
+                    color_var,
+                )
                 wins_html.append(f"""
 <div class="window {w.color}">
   <div class="win-header">
