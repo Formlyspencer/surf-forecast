@@ -29,13 +29,13 @@ def fetch_marine() -> dict:
 
     Uses NCEP GFS-Wave (0.25°) — the same model NOAA and Surfline reference,
     so the wave height + period shown here align with the numbers Spencer
-    sees on NOAA AMZ360 and Surfline. (Open-Meteo's default ECMWF model
-    reports mean period, which runs ~2s shorter than the peak period those
-    other sources report.)
+    sees on NOAA AMZ360 and Surfline. Queried at MARINE_LAT/LON (offshore in
+    the AMZ360 zone, ~15nm SE of the beach) because the beach grid cell
+    averages in shallow water and under-reports height by ~20%.
     """
     params = {
-        "latitude": config.LAT,
-        "longitude": config.LON,
+        "latitude": config.MARINE_LAT,
+        "longitude": config.MARINE_LON,
         "hourly": ",".join([
             "wave_height", "wave_direction", "wave_period",
             "swell_wave_height", "swell_wave_direction", "swell_wave_period",

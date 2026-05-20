@@ -5,9 +5,19 @@ Edit values here to recalibrate. Everything else reads from this module.
 
 # --- Location -----------------------------------------------------------------
 SPOT_NAME = "Folly Beach, SC"
-LAT = 32.655
+LAT = 32.655      # Beach point — used for wind, daylight (what Spencer feels)
 LON = -79.94
 TZ = "America/New_York"
+
+# Marine waves are queried at a point ~15nm offshore, inside the AMZ360
+# forecast zone. GFS-Wave runs at 0.25° resolution; right at the beach the
+# model suppresses height due to averaged-in shallow-water cells, so 3ft @ 8s
+# offshore (matching NOAA AMZ360's marine forecast) reads as 2.4ft at the
+# beach. Calibration thresholds were set against NOAA's offshore values, so we
+# match that by querying offshore. The swell direction barely changes over
+# 15nm so direction stays beach-accurate.
+MARINE_LAT = 32.45
+MARINE_LON = -79.60
 
 # Tide station: Charleston (Customhouse Wharf) is the nearest harmonic station.
 # No oceanfront subordinate exists for Folly; surfers use Charleston directly.
