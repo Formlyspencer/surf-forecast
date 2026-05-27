@@ -39,6 +39,7 @@ def fetch_marine() -> dict:
         "hourly": ",".join([
             "wave_height", "wave_direction", "wave_period",
             "swell_wave_height", "swell_wave_direction", "swell_wave_period",
+            "wind_wave_height", "wind_wave_period",
         ]),
         "models": "ncep_gfswave025",
         "length_unit": "imperial",

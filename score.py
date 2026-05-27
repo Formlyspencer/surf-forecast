@@ -73,6 +73,28 @@ def wind_speed_score(speed_kt: float | None) -> float:
     return config.WIND_SPEED_FLOOR
 
 
+def mixed_sea_score(wind_wave_h_ft: float | None, swell_h_ft: float | None) -> float:
+    """Penalty for mixed seas (wind-wave-dominated or wind/swell competing).
+
+    Clean ground swell → 1.0 (no penalty).
+    Notable wind chop on top of swell → mild penalty.
+    Wind chop dominant → harder penalty.
+
+    Calibration (ratio = wind_wave_h / swell_h):
+      < 0.3   → 1.00  (clean, normal mostly-swell day)
+      0.3-0.6 → 0.95  (slight chop overlay)
+      0.6-1.0 → 0.88  (mixed seas, choppy faces)
+      ≥ 1.0   → 0.80  (wind chop dominates — Surfline would call this 'fair' even on a 4ft day)
+    """
+    if not wind_wave_h_ft or not swell_h_ft or swell_h_ft <= 0:
+        return 1.0
+    ratio = wind_wave_h_ft / swell_h_ft
+    if ratio < 0.3:  return 1.00
+    if ratio < 0.6:  return 0.95
+    if ratio < 1.0:  return 0.88
+    return 0.80
+
+
 def tide_score(t: datetime, extremes: list[dict]) -> float:
     """Score tide phase at time `t` based on hours-from-nearest-extreme.
 
@@ -144,6 +166,7 @@ class Hour:
     wave_h_ft: float | None  # combined seas (wind+swell)
     wave_dir: float | None
     wave_T: float | None
+    wind_wave_h_ft: float | None  # wind-driven chop component
     wind_kt: float | None
     wind_dir: float | None
     wind_gust_kt: float | None
@@ -222,6 +245,7 @@ def build_hours(bundle: dict) -> list[Hour]:
         wave_h = marine_h["wave_height"][i]
         wave_dir = marine_h["wave_direction"][i]
         wave_T = marine_h["wave_period"][i]
+        wind_wave_h = marine_h.get("wind_wave_height", [None]*len(times))[i]
         wind_kt = wind_h["wind_speed_10m"][i]
         wind_dir = wind_h["wind_direction_10m"][i]
         wind_gust = wind_h["wind_gusts_10m"][i]
@@ -235,8 +259,9 @@ def build_hours(bundle: dict) -> list[Hour]:
         wds = wind_dir_score(wind_dir)
         wss = wind_speed_score(wind_kt)
         ts_score = tide_score(t, extremes)
+        ms_score = mixed_sea_score(wind_wave_h, swell_h)
 
-        score = ws * sds * wds * wss * ts_score
+        score = ws * sds * wds * wss * ts_score * ms_score
 
         prev = _previous_extreme(t, extremes)
         nearest_low = _nearest_extreme(t, extremes, "L")
@@ -258,6 +283,7 @@ def build_hours(bundle: dict) -> list[Hour]:
             t=t,
             swell_h_ft=swell_h, swell_dir=swell_dir, swell_T=swell_T,
             wave_h_ft=wave_h, wave_dir=wave_dir, wave_T=wave_T,
+            wind_wave_h_ft=wind_wave_h,
             wind_kt=wind_kt, wind_dir=wind_dir, wind_gust_kt=wind_gust,
             tide_phase=phase,
             score=score,
@@ -267,6 +293,7 @@ def build_hours(bundle: dict) -> list[Hour]:
                 "wind_dir": round(wds, 2),
                 "wind_speed": round(wss, 2),
                 "tide": round(ts_score, 2),
+                "mixed_sea": round(ms_score, 2),
             },
         ))
     return hours
@@ -373,12 +400,18 @@ def find_fallback_windows(
     for r in runs:
         peak = max(r, key=_fallback_quality)
         avg = sum(h.score for h in r) / len(r)
+        # Color by the peak hour's actual score bucket — a fallback window
+        # whose peak hour briefly clears orange/yellow/green deserves that
+        # color, even though find_windows() didn't catch it (because the
+        # surrounding hours dipped below threshold and broke the consecutive
+        # run). "red" only when peak truly is sub-threshold.
+        color = color_bucket(peak.score) or "red"
         windows.append(Window(
             start=r[0].t,
             end=r[-1].t + timedelta(hours=1),
             peak_hour=peak,
             avg_score=avg,
-            color="red",
+            color=color,
         ))
 
     windows.sort(key=lambda w: _fallback_quality(w.peak_hour), reverse=True)

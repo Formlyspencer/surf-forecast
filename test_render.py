@@ -24,11 +24,13 @@ def _hour(t, swell_h, swell_dir, swell_T, wave_h, wave_T, wind_kt, wind_dir, pha
     return score.Hour(
         t=t, swell_h_ft=swell_h, swell_dir=swell_dir, swell_T=swell_T,
         wave_h_ft=wave_h, wave_dir=swell_dir, wave_T=wave_T,
+        wind_wave_h_ft=0.0,
         wind_kt=wind_kt, wind_dir=wind_dir, wind_gust_kt=wind_kt+5,
         tide_phase=phase.replace("-", " "),
         score=ws*sds*wds*wss*ts,
         factors={"wave":round(ws,2),"swell_dir":round(sds,2),
-                 "wind_dir":round(wds,2),"wind_speed":round(wss,2),"tide":round(ts,2)},
+                 "wind_dir":round(wds,2),"wind_speed":round(wss,2),"tide":round(ts,2),
+                 "mixed_sea":1.0},
     )
 
 
